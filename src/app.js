@@ -13,10 +13,10 @@ app.get("/", (request, response) => {
 
 app.get("/conta", async(request, response) => {
     const listaContas = await Conta.find();
-    return response.json(listaContas);
+    response.status(200).send(listaContas);
 });
 
-app.post("/", async(request, response) => {
+app.post("/conta", async(request, response) => {
     const conta = new Conta({
         nome: request.body.nome,
         sobrenome: request.body.sobrenome,
@@ -27,17 +27,30 @@ app.post("/", async(request, response) => {
 })
 
 app.put("/conta/:id", async(request, response) => {
-    const conta = await Conta.findOneAndUpdate({
+    const contaAlterada = await Conta.findOneAndUpdate({
         _id: request.params.id
     }, request.body, {
         new:true
     });
 
-    if(!conta) {
+    if(!contaAlterada) {
         return response.status(404).json({error: "Conta não encontrada"})
     }
 
-    response.status(200).json(conta);
+    response.status(200).json(contaAlterada);
+});
+
+app.delete("/conta/:id", async(request, response) => {
+    const contaExcluida = await Conta.findOneAndDelete({
+        _id: request.params.id
+    }, request.body
+    );
+
+    if(!contaExcluida) {
+        return response.status(404).json({error: "Conta não encontrada"})
+    }
+
+    response.status(204).send()
 });
 
 connect.on("error", (erro) => {
